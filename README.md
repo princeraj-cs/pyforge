@@ -1,6 +1,6 @@
 # pyforge
 
-`pyforge` is a lightweight, interactive command-line interface (CLI) tool designed to scaffold production-ready Python projects in seconds. Inspired by standard scaffolding tools like `create-react-app`, `pyforge` automates project initialization, environment setup, testing configuration, linting, formatting, and dependency management.
+`pyforge` is a lightweight, interactive command-line interface (CLI) tool designed to scaffold production-ready Python projects in seconds. Inspired by standard scaffolding tools, `pyforge` automates project initialization, environment setup, testing configuration, linting, formatting, and dependency management.
 
 ---
 
@@ -18,16 +18,16 @@
 
 ## Installation
 
-Install `pyforge` globally via PyPI:
+Install `pyforge-init` globally via PyPI:
 
 ```bash
-pip install pyforge
+pip install pyforge-init
 ```
 
 Or install it in an isolated environment using `pipx`:
 
 ```bash
-pipx install pyforge
+pipx install pyforge-init
 ```
 
 ---

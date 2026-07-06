@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyforge"
+name = "pyforge-init"
 version = "0.1.0"
 description = "A CLI tool to scaffold new Python projects, similar to create-react-app."
 readme = "README.md"
