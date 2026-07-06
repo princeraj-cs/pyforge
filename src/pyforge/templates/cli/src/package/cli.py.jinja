@@ -1,0 +1,7 @@
+import click
+
+@click.command()
+@click.option("--name", default="World", help="Who to greet.")
+def main(name: str):
+    """Simple CLI entrypoint."""
+    click.echo(f"Hello, {name}!")

@@ -1,0 +1,28 @@
+# {{ project_name }}
+
+{{ description }}
+
+## Getting Started
+
+1. Set up your environment:
+   ```bash
+   {% if use_justfile %}just install{% else %}make install{% endif %}
+   ```
+{% if use_pre_commit %}
+2. Install pre-commit hooks:
+   ```bash
+   pre-commit install
+   ```
+{% endif %}
+
+## Development
+
+Run tests:
+```bash
+{% if use_justfile %}just test{% else %}make test{% endif %}
+```
+
+Format code:
+```bash
+{% if use_justfile %}just format{% else %}make format{% endif %}
+```

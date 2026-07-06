@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = "{{ description }}"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "{{ author }}" }
+]
+{%- if license != 'none' %}
+license = { text = "{{ license }}" }
+{%- endif %}
+
+dependencies = [
+{%- if template == 'fastapi' %}
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+{%- elif template == 'flask' %}
+    "flask>=3.0.0",
+{%- elif template == 'cli' %}
+    "click>=8.0.0",
+{%- endif %}
+]
+
+{%- if template == 'cli' %}
+
+[project.scripts]
+{{ project_name }} = "{{ project_name }}.cli:main"
+{%- endif %}
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+{%- if template == 'fastapi' %}
+    "httpx",
+{%- endif %}
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ project_name }}"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

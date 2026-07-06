@@ -1,0 +1,8 @@
+from click.testing import CliRunner
+from {{ project_name }}.cli import main
+
+def test_main():
+    runner = CliRunner()
+    result = runner.invoke(main, ["--name", "Test"])
+    assert result.exit_code == 0
+    assert "Hello, Test!" in result.output

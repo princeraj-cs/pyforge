@@ -1,0 +1,30 @@
+.PHONY: install test lint format run clean
+
+install:
+	pip install -e ".[dev]"
+
+test:
+	pytest
+
+lint:
+	ruff check .
+
+format:
+	ruff format .
+
+run:
+{%- if template == 'fastapi' %}
+	uvicorn src.{{ project_name }}.main:app --reload
+{%- elif template == 'flask' %}
+	FLASK_APP=src/{{ project_name }}/app.py flask run
+{%- elif template == 'cli' %}
+	{{ project_name }}
+{%- else %}
+	python -m {{ project_name }}
+{%- endif %}
+
+clean:
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name .pytest_cache -exec rm -rf {} +
+	find . -type d -name .ruff_cache -exec rm -rf {} +
+	rm -rf build/ dist/ *.egg-info/
