@@ -18,6 +18,8 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+from pyforge.template_catalog import BUILTIN_TEMPLATE_SET
+
 
 # Use stdlib tomllib on Python 3.11+, fall back to tomli on older versions.
 if sys.version_info >= (3, 11):
@@ -41,9 +43,6 @@ KNOWN_KEYS: Dict[str, type] = {
 }
 
 VALID_LICENSES = {"MIT", "Apache-2.0", "none"}
-BUILTIN_TEMPLATES = {"basic", "cli", "fastapi", "flask"}
-
-
 def _config_path() -> Path:
     """Return the config file path, respecting the env-var override."""
     env_override = os.environ.get(CONFIG_ENV_VAR)
@@ -107,7 +106,7 @@ def _validate(raw: Dict[str, Any], path: Path) -> Dict[str, Any]:
                 f"{sorted(VALID_LICENSES)}, got '{value}' — ignoring.[/dim yellow]"
             )
             continue
-        if key == "template" and value not in BUILTIN_TEMPLATES and not value.startswith("gh:"):
+        if key == "template" and value not in BUILTIN_TEMPLATE_SET and not value.startswith("gh:"):
             console.print(
                 f"[dim yellow]Config: 'template' '{value}' is not a built-in template "
                 f"and doesn't start with 'gh:' — ignoring.[/dim yellow]"

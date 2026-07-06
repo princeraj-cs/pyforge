@@ -123,6 +123,19 @@ def generate_project(
             package_dir / "__init__.py",
         )
 
+        if template_type == "basic":
+            render_template(
+                env,
+                "src/package/main.py.jinja",
+                context,
+                package_dir / "main.py",
+            )
+            render_template(
+                env,
+                "src/package/__main__.py.jinja",
+                context,
+                package_dir / "__main__.py",
+            )
         if template_type == "cli":
             render_template(
                 env,

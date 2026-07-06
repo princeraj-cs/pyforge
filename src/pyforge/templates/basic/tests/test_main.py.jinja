@@ -1,3 +1,7 @@
-def test_example():
-    """Example test that always passes."""
-    assert True
+from {{ project_name }}.main import main
+
+
+def test_main_prints_greeting(capsys):
+    main()
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Hello from {{ project_name }}!"

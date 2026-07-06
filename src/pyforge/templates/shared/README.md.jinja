@@ -2,9 +2,29 @@
 
 {{ description }}
 
-## Getting Started
+## Overview
 
-1. Set up your environment:
+- Template: `{{ template }}`
+- Author: `{{ author }}`
+- License: `{{ license }}`
+
+{% if template == 'fastapi' %}
+- Entry point: `src/{{ project_name }}/main.py`
+- Run the API with `uvicorn src.{{ project_name }}.main:app --reload`
+{% elif template == 'flask' %}
+- Entry point: `src/{{ project_name }}/app.py`
+- Run the app with `flask run`
+{% elif template == 'cli' %}
+- Entry point: `src/{{ project_name }}/cli.py`
+- Run the command after installation with `{{ project_name }}`
+{% else %}
+- Entry point: `src/{{ project_name }}/main.py`
+- Run the package with `python -m {{ project_name }}`
+{% endif %}
+
+## Quick Start
+
+1. Install the project dependencies:
    ```bash
    {% if use_justfile %}just install{% else %}make install{% endif %}
    ```
@@ -14,15 +34,19 @@
    pre-commit install
    ```
 {% endif %}
+3. Run the test suite:
+   ```bash
+   {% if use_justfile %}just test{% else %}make test{% endif %}
+   ```
 
 ## Development
-
-Run tests:
-```bash
-{% if use_justfile %}just test{% else %}make test{% endif %}
-```
 
 Format code:
 ```bash
 {% if use_justfile %}just format{% else %}make format{% endif %}
+```
+
+Run the application:
+```bash
+{% if use_justfile %}just run{% else %}make run{% endif %}
 ```

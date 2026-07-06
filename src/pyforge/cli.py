@@ -9,23 +9,26 @@ Precedence for values (highest → lowest):
 from __future__ import annotations
 
 import sys
-import click
 from pathlib import Path
+from typing import Optional
+
+import click
 from rich.console import Console
 
 from pyforge.config import load_config
-from pyforge.prompts import ask_questions
-from pyforge.utils import is_valid_package_name, create_virtual_environment, init_git_repo
 from pyforge.generator import generate_project
+from pyforge.prompts import ask_questions
 from pyforge.remote import is_remote_template
+from pyforge.template_catalog import BUILTIN_TEMPLATES
+from pyforge.utils import is_valid_package_name, create_virtual_environment, init_git_repo
 
 console = Console()
 
-BUILTIN_TEMPLATES = {"basic", "cli", "fastapi", "flask"}
 
-
-def _validate_template(ctx: click.Context, param: click.Parameter, value: str) -> str:
+def _validate_template(ctx: click.Context, param: click.Parameter, value: Optional[str]) -> Optional[str]:
     """Click callback that validates both built-in names and gh: strings."""
+    if value is None:
+        return None
     if value in BUILTIN_TEMPLATES or is_remote_template(value):
         return value
     raise click.BadParameter(
@@ -39,13 +42,14 @@ def _validate_template(ctx: click.Context, param: click.Parameter, value: str) -
 @click.argument("project_name")
 @click.option(
     "--template",
-    default="basic",
-    show_default=True,
+    default=None,
+    show_default=False,
     callback=_validate_template,
     is_eager=True,
     help=(
         "Project template. Built-ins: basic, cli, fastapi, flask. "
-        "Remote: gh:username/repo or gh:username/repo@ref."
+        "Remote: gh:username/repo or gh:username/repo@ref. "
+        "Omit to pick interactively."
     ),
 )
 @click.option(
@@ -96,6 +100,7 @@ def main(
 
     # ── Load config file defaults ─────────────────────────────────────────────
     cfg = load_config()
+    config_template = cfg.get("template")
 
     # CLI flags override config-file values.
     # (no_pre_commit and justfile are False by default, so only override
@@ -105,10 +110,7 @@ def main(
 
     # Template: CLI always wins over config.
     # (template is already validated by the click callback)
-    effective_template = template  # CLI value (default "basic" or user-supplied)
-    if template == "basic" and "template" in cfg:
-        # Only use config template when the CLI value is the pure default.
-        effective_template = cfg["template"]
+    effective_template = template or config_template
 
     # ── Collect answers ───────────────────────────────────────────────────────
     if accept_defaults:
@@ -118,7 +120,7 @@ def main(
             "description": cfg.get("description", "A new Python project"),
             "author": cfg.get("author", "Your Name"),
             "license": cfg.get("license", "MIT"),
-            "template": effective_template,
+            "template": effective_template or "basic",
             "use_pre_commit": not effective_no_pre_commit,
             "use_justfile": effective_justfile,
         }
@@ -130,19 +132,21 @@ def main(
             "description": cfg.get("description", "A new Python project"),
             "author": cfg.get("author", "Your Name"),
             "license": cfg.get("license", "MIT"),
+            "template": effective_template or "basic",
         }
         try:
-            answers = ask_questions(project_name, wizard_defaults)
+            answers = ask_questions(project_name, wizard_defaults, template=template)
         except (KeyboardInterrupt, click.exceptions.Abort):
             console.print("\n[dim]Aborted.[/dim]")
             sys.exit(0)
 
         init_venv = answers.pop("init_venv", True)
         init_git = answers.pop("init_git", True)
+        selected_template = template or answers.pop("template", wizard_defaults["template"])
 
         context = {
             **answers,
-            "template": effective_template,
+            "template": selected_template,
             "use_pre_commit": not effective_no_pre_commit,
             "use_justfile": effective_justfile,
         }
@@ -166,7 +170,7 @@ def main(
 
     console.print(
         f"\n[bold green]✓ Project [bold white]{project_name}[/bold white] created "
-        f"with template [bold white]{effective_template}[/bold white]![/bold green]"
+        f"with template [bold white]{context['template']}[/bold white]![/bold green]"
     )
     console.print("\n[bold]Next steps:[/bold]")
     console.print(f"  [cyan]cd {project_name}[/cyan]")

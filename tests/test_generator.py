@@ -40,6 +40,8 @@ def test_generate_project_basic(tmp_path):
     assert not (project_dir / "Justfile").exists()
     assert (project_dir / ".pre-commit-config.yaml").exists()
     assert (project_dir / "src" / "testproject" / "__init__.py").exists()
+    assert (project_dir / "src" / "testproject" / "main.py").exists()
+    assert (project_dir / "src" / "testproject" / "__main__.py").exists()
     assert (project_dir / "tests" / "test_main.py").exists()
 
 

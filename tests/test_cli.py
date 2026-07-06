@@ -39,6 +39,31 @@ def test_cli_yes_flag_creates_project(tmp_path):
         assert (Path(cwd) / "myproject" / "pyproject.toml").exists()
 
 
+def test_cli_interactive_template_selection(tmp_path):
+    """Interactive runs should accept the template chosen in the wizard."""
+    runner = CliRunner()
+    answers = {
+        "project_name": "myproject",
+        "description": "A polished project",
+        "author": "Test Author",
+        "license": "MIT",
+        "template": "flask",
+        "init_venv": False,
+        "init_git": False,
+    }
+
+    with patch("pyforge.cli.ask_questions", return_value=answers) as mock_ask:
+        with patch("pyforge.cli.generate_project") as mock_gen:
+            with runner.isolated_filesystem(temp_dir=tmp_path):
+                result = runner.invoke(main, ["myproject"])
+
+    assert result.exit_code == 0, result.output
+    mock_ask.assert_called_once()
+    mock_gen.assert_called_once()
+    context = mock_gen.call_args[0][1]
+    assert context["template"] == "flask"
+
+
 def test_cli_invalid_template():
     """An unrecognised, non-gh: template string raises BadParameter."""
     runner = CliRunner()

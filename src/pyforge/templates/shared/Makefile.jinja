@@ -1,4 +1,15 @@
-.PHONY: install test lint format run clean
+.DEFAULT_GOAL := help
+
+.PHONY: help install test lint format run clean
+
+help:
+	@echo "Available targets:"
+	@echo "  install  Install the project in editable mode with dev dependencies"
+	@echo "  test     Run the test suite"
+	@echo "  lint     Run Ruff checks"
+	@echo "  format   Format the codebase with Ruff"
+	@echo "  run      Start the generated application"
+	@echo "  clean    Remove local build and cache artifacts"
 
 install:
 	pip install -e ".[dev]"
